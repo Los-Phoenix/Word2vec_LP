@@ -16,7 +16,7 @@ test_num = 200
 data_dim = 28*28
 out_dim = 5
 xIn = np.random.uniform(0, 1, [sample_num+test_num, data_dim])#这是个假的输入
-W = np.random.randint(0, 3, [data_dim, out_dim])
+W = np.random.uniform(0, 1, [data_dim, out_dim])
 # print W
 xIn2prev = xIn.dot(W)
 # xIn2prev = xIn * W
@@ -32,29 +32,29 @@ y = tf.placeholder(tf.float32, shape = (None, out_dim))
 x_image = tf.reshape(x, [-1, 28, 28, 1])
 num = 10
 with tf.variable_scope("Ez_flat"):
-    W1 = tf.Variable(tf.truncated_normal([28,5,1,10], stddev = 0.1), 'weight1', dtype=tf.float32)
-    b1 = tf.Variable(np.random.rand(1, 10), 'bias1', dtype=tf.float32)
+    W1 = tf.Variable(tf.truncated_normal([28,1,1,3], stddev = 0.1), 'weight1', dtype=tf.float32)
+    # b1 = tf.Variable(np.random.rand(1, 5), 'bias1', dtype=tf.float32)
 
-    conv1 = tf.nn.conv2d(x_image, W1, strides=[1,1,1,1], padding='SAME') + b1
+    conv1 = tf.nn.conv2d(x_image, W1, strides=[1,1,1,1], padding='VALID')# + b1
 
     # h_conv1 = tf.nn.relu(conv1)
     h_conv1 = conv1
-    pool1 = tf.nn.max_pool(h_conv1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-
-    W2 = tf.Variable(tf.truncated_normal([14, 5, 10, 8], stddev=0.1), 'weight1', dtype=tf.float32)
-    b2 = tf.Variable(np.random.rand(1, 8), 'bias1', dtype=tf.float32)
-
-    conv2 = tf.nn.conv2d(pool1, W2, strides=[1, 1, 1, 1], padding='SAME') + b2
-
-    # h_conv2 = tf.nn.relu(conv2)
-    h_conv2 = conv2
-    pool2 = tf.nn.max_pool(h_conv2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+    # pool1 = tf.nn.max_pool(h_conv1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+    #
+    # W2 = tf.Variable(tf.truncated_normal([14, 5, 10, 8], stddev=0.1), 'weight1', dtype=tf.float32)
+    # b2 = tf.Variable(np.random.rand(1, 8), 'bias1', dtype=tf.float32)
+    #
+    # conv2 = tf.nn.conv2d(pool1, W2, strides=[1, 1, 1, 1], padding='SAME') + b2
+    #
+    # # h_conv2 = tf.nn.relu(conv2)
+    # h_conv2 = conv2
+    # pool2 = tf.nn.max_pool(h_conv1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
     #以下7*7的意思是输入为28*28， 经过两次2*2的maxpool，得到了
-    W3 = tf.Variable(tf.truncated_normal([7*7*8, out_dim], stddev=0.1), 'weight1', dtype=tf.float32)
+    W3 = tf.Variable(tf.truncated_normal([28*28*3, out_dim], stddev=0.1), 'weight1', dtype=tf.float32)
     # b3 = tf.Variable(np.random.rand(1, out_dim), 'bias1', dtype=tf.float32)
 
-    L2_out = tf.matmul(tf.reshape(pool2, [-1, 7*7*8]), W3)# + b3
+    L2_out = tf.matmul(tf.reshape(h_conv1, [-1, 28*28*3]), W3)# + b3
 
     loss = tf.reduce_sum((y - L2_out) ** 2)
     # loss = tf.reduce_mean(loss)
@@ -64,7 +64,7 @@ with tf.name_scope("training-accuracy") as scope:
     train_accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
     train_accuracy_summary = tf.summary.scalar("training accuracy", train_accuracy)
 
-opt = tf.train.AdamOptimizer(0.1)
+opt = tf.train.AdamOptimizer(0.001)
 train_op = opt.minimize(loss)
 
 with tf.Session() as sess:
@@ -75,7 +75,7 @@ with tf.Session() as sess:
         # print inputSam
         xSam = xIn[randList, :]
         ySam = xIn2[randList, :]
-        _, loss_val, W1_val, b1_val = sess.run([train_op, loss, W1, b1],
+        _, loss_val, W1_val = sess.run([train_op, loss, W1],
                                                feed_dict={x: xSam.reshape(-1, data_dim),
                                                           y: ySam.reshape(-1, out_dim)})
 
@@ -87,6 +87,7 @@ with tf.Session() as sess:
                                                        y: xIn2[sample_num:]})
             # print W1_val
             print '#' * 20
+            print W1_val
             print loss_val
             print accu
             print accu_test
