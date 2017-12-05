@@ -90,7 +90,9 @@ cha_processor.fit(cha_vocab)
 x = np.array(list(cha_processor.transform([' '.join(i) for i in listWords])))
 
 samplesize = 500
-f1_num = 10
+f1_num = 20
+f2_num = 40
+middle_dim = 200
 with tf.variable_scope("Ez_flat"):
     wordEmbed = tf.Variable(tf.constant(0.0, shape=[vocab_size, embedding_dim]),
                     trainable=False, name="Word")
@@ -111,16 +113,20 @@ with tf.variable_scope("Ez_flat"):
     yEmbed = tf.reshape(yEmbedRaw, [-1, embedding_dim])
 
     W1 = tf.Variable(tf.truncated_normal([2, 1, 1, f1_num], stddev=0.1), 'weight1', dtype=tf.float32)
-    #b1 = tf.Variable(np.random.rand(1, 5), 'bias1', dtype=tf.float32)
-    conv1 = tf.nn.conv2d(xEmbed, W1, strides=[1, 1, 1, 1], padding='VALID')#  + b1
+    b1 = tf.Variable(np.random.rand(1, f1_num), 'bias1', dtype=tf.float32)
+    conv1 = tf.nn.conv2d(xEmbed, W1, strides=[1, 1, 1, 1], padding='VALID')  + b1
     h_conv1 = tf.nn.relu(conv1)
     pool1 = tf.nn.max_pool(h_conv1, ksize=[1, 2, 1, 1], strides=[1, 2, 1, 1], padding='SAME')
 
-    W2 = tf.Variable(tf.truncated_normal([2, 2, f1_num, 4], stddev=0.1), 'weight1', dtype=tf.float32)
-    conv2 = tf.nn.conv2d(pool1, W2, strides=[1, 1, 1, 1], padding='SAME')  # + b1
+    W2 = tf.Variable(tf.truncated_normal([2, 2, f1_num, f2_num], stddev=0.1), 'weight2', dtype=tf.float32)
+    b2 = tf.Variable(np.random.rand(1, f2_num), 'bias1', dtype=tf.float32)
+    conv2 = tf.nn.conv2d(pool1, W2, strides=[1, 1, 1, 1], padding='SAME')   + b2
+
     h_conv2 = tf.nn.relu(conv2)
-    W3 = tf.Variable(tf.truncated_normal([(cha_embedding_dim) *( max_document_length - 2) * 4, embedding_dim], stddev=0.1), 'weight1', dtype=tf.float32)
-    L2_out = tf.matmul(tf.reshape(h_conv2, [-1, (cha_embedding_dim)*( max_document_length - 2) * 4]), W3)
+    W3 = tf.Variable(tf.truncated_normal([(cha_embedding_dim) *(2) * f2_num, middle_dim], stddev=0.1), 'weight3', dtype=tf.float32)
+    L_middle = tf.matmul(tf.reshape(h_conv2, [-1, (cha_embedding_dim)*(2) * f2_num]), W3)
+    W4 = tf.Variable(tf.truncated_normal([middle_dim, embedding_dim], stddev=0.1), 'weight4', dtype=tf.float32)
+    L2_out = tf.matmul(tf.reshape(L_middle, [-1, middle_dim]), W4)
 
     loss = tf.reduce_mean((yEmbed - L2_out) ** 2)
 
@@ -133,6 +139,10 @@ with tf.name_scope("training-accuracy") as scope:
     train_accuracy_summary = tf.summary.scalar("training accuracy", train_accuracy)
 
 with tf.Session() as sess:
+    shuffleList = np.random.randint(0,len(x), size=(1, len(x)))
+    x = x[shuffleList, :].reshape(-1,max_document_length)
+    y = y[shuffleList, :].reshape(-1,1)
+    print x.shape
     sess.run(tf.global_variables_initializer())
     sess.run([embedding_init,char_embedding_init], feed_dict={embedding_placeholder: embedding,
                                                               char_embedding_placeholder:char_embd})
@@ -149,11 +159,11 @@ with tf.Session() as sess:
         if cnt % 100 == 0:
             print y_out-y_std
         #     randList = np.random.randint(0, vocab_size - 1, size=(1, samplesize))
-        #     xSam = x[6501:7001]
-        #     ySam = y[6501:7001]
-        #     accu_test = train_accuracy.eval(feed_dict={xIn: xSam.reshape(-1,max_document_length),
-        #                                                 yIn: ySam.reshape(-1,1)})
-        #     print 'testAccu', accu_test
+            xSam = x[6501:7001]
+            ySam = y[6501:7001]
+            accu_test = train_accuracy.eval(feed_dict={xIn: xSam.reshape(-1,max_document_length),
+                                                         yIn: ySam.reshape(-1,1)})
+            print 'testAccu', accu_test
 
     # print xR
     # print yR
