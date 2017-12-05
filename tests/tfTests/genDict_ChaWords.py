@@ -4,46 +4,32 @@
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
-
-fPos = open("../../data/woodWikiTestPos1000")
-linesPos = list(fPos)
-fConf = open("../../data/woodWikiTestConfused1000")
-linesConf = list(fConf)
-fDiff = open("../../data/woodWikiTestDiffClass1000")
-linesDiff = list(fDiff)
-
 fCha = open("../../data/wiki_cha/zh_model_200_all_voc_cha")
 linesCha = list(fCha)
 chaSet =set([i.split(' ')[0].decode() for i in linesCha])
 
-fDictOut = open("../../data/unionDict1000", 'w')
+fWord = open("../../data/wiki_word/zh_model_200_all_voc")
+linesWord = list(fWord)
+wordSet =set([i.split(' ')[0].decode() for i in linesWord])
 
-wordsPos = [i.split('\t')[1].decode() for i in linesPos]
-print 'listPos:',len(wordsPos)
-posSet = set(wordsPos)
-print 'setPos:',len(posSet)
+fDictOut = open("../../data/interDictCharWord", 'w')
 
-wordsConf = [i.split('\t')[2].strip().decode() for i in linesConf]
-print 'listConf:',len(wordsConf)
-confSet = set(wordsConf)
-print 'setConf:',len(confSet)
+interSet = chaSet.intersection(wordSet)
+multiWordSet = wordSet.difference(chaSet)
+multiWordCharSet = set([])
 
-wordsDiff = [i.split('\t')[2].strip().decode() for i in linesDiff]
-print 'listDiff:',len(wordsDiff)
-diffSet = set(wordsDiff)
-print 'setDiff:',len(diffSet)
+for word in multiWordSet:
+    for cha in word:
+        multiWordCharSet.add(cha)
 
-unionSet = posSet.union(diffSet)
-print 'setUnion:',len(unionSet)
+interSet = interSet.intersection(multiWordCharSet)
 
-legalSet = set([])
-legalCharSet = set([])
-for word in unionSet:
-    if all(i in chaSet for i in word):
-        legalCharSet = legalCharSet.union(set([char for char in word]))
-        fDictOut.write(word+'\n')
-        legalSet.add(word)
+print 'setUnion:',len(interSet)
 
-print 'setLegal:',len(legalSet)
-print 'setCharLegal:', len(legalCharSet)
+cnt = 0
+for word in interSet:
+    cnt += 1
+    print cnt
+    fDictOut.write(word+'\n')
+
     #那么，词都在字字典里的有多少呢？
