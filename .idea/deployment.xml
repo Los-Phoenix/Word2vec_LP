@@ -2,14 +2,7 @@
 <project version="4">
   <component name="PublishConfigData" autoUpload="Always" serverName="TF-ubuntu">
     <serverData>
-      <paths name="Copy of project-level server 'lenovo'">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="Copy of project-level server '小度'">
+      <paths name="EV3">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />

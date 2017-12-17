@@ -4,7 +4,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-model = gensim.models.Word2Vec.load("zh_model_100")
+model = gensim.models.Word2Vec.load("../data/wiki_word/zh_model_200_all")
 result = model.most_similar(u"元气")
     #print(result)
 for e in result:
