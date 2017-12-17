@@ -22,21 +22,21 @@ if __name__ == '__main__':
     logger.info("running %s" % ' '.join(sys.argv))
 
     # check and process input arguments
-    if len(sys.argv) < 4:
+    if False:
         print("Useing: python train_word2vec_model.py input_text "
               "output_gensim_model output_word_vector")
         sys.exit(1)
-    inp, outp1, outp2 = sys.argv[1:4]
-    inp = "novelOne2.text.seg"
+    #inp, outp1, outp2 = sys.argv[1:4]
+    inp = "../data/novel2/novelOne2.text.seg"
     model = Word2Vec(LineSentence(inp), size=100, window=10, min_count=3,
                      workers=multiprocessing.cpu_count())
 
     #model.save(outp1)
     #model.wv.save_word2vec_format(outp2)
 
-    model.save("zh_novel_model_100")
-    model.wv.save_word2vec_format("zh_novel_model_100_vec",
-                                  "zh_novel_model_100_voc",
+    model.save("../data/novel2/zh_novel_model_100")
+    model.wv.save_word2vec_format("../data/novel2/zh_novel_model_100_vec",
+                                  "../data/novel2/zh_novel_model_100_voc",
                                   binary=False)
 
     result = model.most_similar(u"早晨")
