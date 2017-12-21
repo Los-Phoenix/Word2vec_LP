@@ -52,7 +52,7 @@ def loadWord2Vec(filename, dictSet):
     fr.close()
     return vocab,embd
 
-vocab,embd = loadWord2Vec('../../data/wiki_word/zh_model_200_all_vec', wordSet)
+vocab,embd = loadWord2Vec('../../data/wikiDummy/Dummy_model_vec', wordSet)
 vocab_size = len(vocab) + 1
 embedding_dim = len(embd[0])
 embedding = np.asarray(embd)
@@ -71,7 +71,7 @@ pretrain = vocab_processor.fit(vocab)
 y = np.array(list(vocab_processor.transform(listWords)))
 print y
 
-cha_vocab,char_embd = loadWord2Vec('../../data/wiki_cha/zh_model_200_all_vec_cha', chaSet)
+cha_vocab,char_embd = loadWord2Vec('../../data/wikiDummy/Dummy_model_vec', chaSet)
 char_size = len(cha_vocab) + 1
 cha_embedding_dim = len(char_embd[0])
 cha_embedding = np.asarray(char_embd)
@@ -90,14 +90,14 @@ cha_processor.fit(cha_vocab)
 x = np.array(list(cha_processor.transform([' '.join(i) for i in listWords])))
 
 samplesize = 500
-f1_num = 20
-f2_num = 40
-middle_dim = 200
+f1_num = 100
+f2_num = 100
+middle_dim = 500
 with tf.variable_scope("Ez_flat"):
     wordEmbed = tf.Variable(tf.constant(0.0, shape=[vocab_size, embedding_dim]),
-                    trainable=False, name="Word")
+                    trainable=True, name="Word")
     charEmbed = tf.Variable(tf.constant(0.0, shape=[char_size, cha_embedding_dim]),
-                            trainable=False, name="Char")
+                            trainable=True, name="Char")
     embedding_placeholder = tf.placeholder(tf.float32, [vocab_size, embedding_dim])
     char_embedding_placeholder = tf.placeholder(tf.float32, [char_size, cha_embedding_dim])
 
@@ -124,9 +124,16 @@ with tf.variable_scope("Ez_flat"):
 
     h_conv2 = tf.nn.relu(conv2)
     W3 = tf.Variable(tf.truncated_normal([(cha_embedding_dim) *(2) * f2_num, middle_dim], stddev=0.1), 'weight3', dtype=tf.float32)
-    L_middle = tf.matmul(tf.reshape(h_conv2, [-1, (cha_embedding_dim)*(2) * f2_num]), W3)
+    b3 = tf.Variable(np.random.rand(1, middle_dim), 'bias1', dtype=tf.float32)
+    L_middle_in = tf.matmul(tf.reshape(h_conv2, [-1, (cha_embedding_dim)*(2) * f2_num]), W3) + b3
+
+    L_middle = tf.nn.sigmoid(L_middle_in)
+
+
     W4 = tf.Variable(tf.truncated_normal([middle_dim, embedding_dim], stddev=0.1), 'weight4', dtype=tf.float32)
-    L2_out = tf.matmul(tf.reshape(L_middle, [-1, middle_dim]), W4)
+    b4 = tf.Variable(np.random.rand(1, embedding_dim), 'bias1', dtype=tf.float32)
+    L2_in = tf.matmul(tf.reshape(L_middle, [-1, middle_dim]), W4) + b4
+    L2_out = tf.nn.sigmoid(L2_in)
 
     loss = tf.reduce_mean((yEmbed - L2_out) ** 2)
 
@@ -156,7 +163,7 @@ with tf.Session() as sess:
                                                    yIn: ySam.reshape(-1,1)})
         if cnt % 10 == 0:
             print loss_val
-        if cnt % 100 == 0:
+        if cnt % 1000 == 0:
             print y_out-y_std
         #     randList = np.random.randint(0, vocab_size - 1, size=(1, samplesize))
             xSam = x[6501:7001]

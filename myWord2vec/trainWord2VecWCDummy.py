@@ -9,8 +9,7 @@ import logging
 import os
 import sys
 import multiprocessing
-
-from Word2VecWC import Word2VecWC
+import time
 
 from gensim.models import Word2Vec
 from gensim.models.word2vec import LineSentence
@@ -26,20 +25,19 @@ if __name__ == '__main__':
     CPUcount = multiprocessing.cpu_count()
     print(CPUcount)
 
-    inp = "../data/novel2/novelOne2.text.seg"
+    # inp = "../data/wikiDummy/wikiShort"
+    inp = "../data/wikiDummy/wikiDummy"
     lines = LineSentence(inp)
     print(lines.max_sentence_length)
+    t = time.time()
+    model = Word2Vec(lines, size=100, window=20, min_count=5, iter=20, workers=10)
 
-    model = Word2VecWC(lines, size=50, window=5, min_count=20,workers=CPUcount)
-    #model.save(outp1)
-    #model.wv.save_word2vec_format(outp2)
-
-    model.save("../data/novel2/Dummy_model")
-    model.wv.save_word2vec_format("../data/novel2/Dummy_model_vec",
-                                  "../data/novel2/Dummy_model_voc",
+    model.save("../data/wikiDummy/Dummy_model")
+    model.wv.save_word2vec_format("../data/wikiDummy/Dummy_model_vec",
+                                  "../data/wikiDummy/Dummy_model_voc",
                                   binary=False)
-
-    result = model.most_similar(u"早晨")
+    logging.info("The time is %d", time.time() - t)
+    result = model.most_similar(u"阿基米德")
     #print(result)
     for e in result:
         print(e[0], e[1])

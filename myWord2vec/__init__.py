@@ -1,0 +1,1 @@
+from .Word2VecWC import Word2VecWC

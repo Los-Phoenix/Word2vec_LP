@@ -15,6 +15,7 @@ sys.setdefaultencoding('utf-8')
 
 #再查一下
 #把输入层和输出层打印出来就好了
+print()
 
 fDictWord = open("../../data/unionDict1000")
 listWords =list(fDictWord)
@@ -52,7 +53,7 @@ def loadWord2Vec(filename, dictSet):
     fr.close()
     return vocab,embd
 
-vocab,embd = loadWord2Vec('../../data/wiki_word/zh_model_200_all_vec', wordSet)
+vocab,embd = loadWord2Vec('../../data/wikiDummy/Dummy_model_vec', wordSet)
 vocab_size = len(vocab) + 1
 embedding_dim = len(embd[0])
 embedding = np.asarray(embd)
@@ -71,7 +72,7 @@ pretrain = vocab_processor.fit(vocab)
 y = np.array(list(vocab_processor.transform(listWords)))
 print y
 
-cha_vocab,char_embd = loadWord2Vec('../../data/wiki_cha/zh_model_200_all_vec_cha', chaSet)
+cha_vocab,char_embd = loadWord2Vec('../../data/wikiDummy/Dummy_model_vec', chaSet)
 char_size = len(cha_vocab) + 1
 cha_embedding_dim = len(char_embd[0])
 cha_embedding = np.asarray(char_embd)
@@ -90,6 +91,7 @@ cha_processor.fit(cha_vocab)
 x = np.array(list(cha_processor.transform([' '.join(i) for i in listWords])))
 
 samplesize = 500
+f_num = 50
 with tf.variable_scope("Ez_flat"):
     wordEmbed = tf.Variable(tf.constant(0.0, shape=[vocab_size, embedding_dim]),
                     trainable=False, name="Word")
@@ -109,12 +111,16 @@ with tf.variable_scope("Ez_flat"):
     yEmbedRaw = tf.nn.embedding_lookup(wordEmbed, yIn)
     yEmbed = tf.reshape(yEmbedRaw, [-1, embedding_dim])
 
-    W1 = tf.Variable(tf.truncated_normal([2, 1, 1, 10], stddev=0.1), 'weight1', dtype=tf.float32)
+    W1 = tf.Variable(tf.truncated_normal([2, 1, 1, f_num], stddev=0.1), 'weight1', dtype=tf.float32)
     #b1 = tf.Variable(np.random.rand(1, 5), 'bias1', dtype=tf.float32)
     conv1 = tf.nn.conv2d(xEmbed, W1, strides=[1, 1, 1, 1], padding='VALID')#  + b1
 
-    W3 = tf.Variable(tf.truncated_normal([cha_embedding_dim *( max_document_length - 1) * 10, embedding_dim], stddev=0.1), 'weight1', dtype=tf.float32)
-    L2_out = tf.matmul(tf.reshape(conv1, [-1, cha_embedding_dim * ( max_document_length - 1) * 10]), W3)
+
+
+    W3 = tf.Variable(tf.truncated_normal([cha_embedding_dim *( max_document_length - 1) * f_num, embedding_dim], stddev=0.1), 'weight1', dtype=tf.float32)
+    L2_in = tf.matmul(tf.reshape(conv1, [-1, cha_embedding_dim * ( max_document_length - 1) * f_num]), W3)
+    L2_out = tf.nn.sigmoid(L2_in)
+
     loss = tf.reduce_mean((yEmbed - L2_out) ** 2)
 
 opt = tf.train.AdamOptimizer(0.001)
