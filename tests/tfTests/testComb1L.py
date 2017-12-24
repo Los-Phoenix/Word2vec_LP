@@ -17,20 +17,14 @@ sys.setdefaultencoding('utf-8')
 #字查找词
 #词组织成一行（最多40个）
 
-
-print()
-
+sim_num = 1000
 model = gensim.models.Word2Vec.load("../../data/wikiDummy2/Dummy_model")
 
 fDictWord = open("../../data/unionDict1000")
-listWords =list(fDictWord)
-listWords = [i.strip().decode() for i in listWords]
-# listWords = listWords[0:100]
+listWords_raw =list(fDictWord)
 
-wordSet = set(listWords)
-chaSet = set([])
-for word in wordSet:
-    chaSet = chaSet.union(set([char for char in word]))
+
+#listWords = listWords[0:100]
 
 # print 'setLegal:',len(wordSet)
 #
@@ -64,38 +58,68 @@ vocab_size = len(vocab) + 1
 embedding_dim = len(embd[0])
 embedding = np.asarray(embd)
 print vocab_size,embedding_dim
+
+listWords = list()
+for i in listWords_raw:
+    word_temp = i.strip().decode()
+    if len(word_temp) == 2 and word_temp in vocab:
+        #print word_temp
+        listWords.append(word_temp)
+#listWords = listWords[0:100]
 #
 # #init vocab processor
 max_document_length = 1
-vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length)
-pretrain = vocab_processor.fit(vocab)
-y = np.array(list(vocab_processor.transform(listWords)))
+processor = learn.preprocessing.VocabularyProcessor(max_document_length)
+pretrain = processor.fit(vocab)
+y = np.array(list(processor.transform(listWords)))
+print y.shape
 print y
 
-max_document_length = 40
+max_document_length = 2 * sim_num
 processor = learn.preprocessing.VocabularyProcessor(max_document_length)
-processor.fit(vocab)
+pretrain = processor.fit(vocab)
 sim_list = list()
+other_list = list()
+
 for i in listWords:#每一个i代表一个词，结果需要组织在一个字符串里
     str = ''
-    for j in i:#j代表一个字
-        if not j in model.wv.vocab:
-            continue
-        for j_sim in model.wv.most_similar(j):
+    other_str = ''
+    j = i[0] #j代表一个字
+    j_other = i[1]
+    if j in model.wv.vocab:
+        for j_sim in model.wv.most_similar(j, sim_num):
+            # print(j_sim[0] in vocab)
+            if j_sim == i:
+                print "Found self "+i
+                continue
+            str += j_sim[0] + ' '
+            other_str += j_other + ' '
+
+    j = i[1]  # j代表一个字
+    j_other = i[0]
+    if j in model.wv.vocab:
+        for j_sim in model.wv.most_similar(j, sim_num):
+            if j_sim == i:
+                print "Found self "+ i
+                continue
             # print(j_sim[0] in vocab)
             str += j_sim[0] + ' '
+            other_str += j_other + ' '
+
     sim_list.append(str)
+    other_list.append(other_str)
 
-# print sim_list
+x = np.array(list(processor.transform(sim_list)))
+x_other = np.array(list(processor.transform(other_list)))
 
-qq = list(processor.transform(sim_list))
-print(qq)
-x = np.array(qq)
+print x.shape
+print x_other.shape
+
+print x
+print x_other
+
 samplesize = 500
 f_num = 5
-
-del (model)
-gc.collect()
 
 with tf.variable_scope("Ez_flat"):
     wordEmbed = tf.Variable(tf.constant(0.0, shape=[vocab_size, embedding_dim]),
