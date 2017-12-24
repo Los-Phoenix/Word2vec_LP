@@ -30,7 +30,7 @@ if __name__ == '__main__':
     lines = LineSentence(inp)
     print(lines.max_sentence_length)
     t = time.time()
-    model = Word2Vec(lines, size=100, window=20, min_count=5, iter=20, workers=10)
+    model = Word2Vec(lines, size=100, window=20, min_count=5, workers=10)
 
     model.save("../data/wikiDummy/Dummy_model")
     model.wv.save_word2vec_format("../data/wikiDummy/Dummy_model_vec",

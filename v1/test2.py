@@ -14,7 +14,13 @@ model = gensim.models.Word2Vec.load("../data/wikiDummy/Dummy_model")
 # for char in charSet:
 #     char = char.decode()#这里注意，只有Unicode编码才行
 #     print len(model[char])
-print model[u'']
+
+# i = u"这是一个贤良之人"
+# for j in i :
+#     print j, model[j]
 
 # model2 = Word2VecWC.load("../data/wiki_word/zh_model_200_all")
 # print model2[u'贤良']
+
+for i in model.wv.vocab.keys():
+    print i
