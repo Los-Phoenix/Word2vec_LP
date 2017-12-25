@@ -20,19 +20,8 @@ sys.setdefaultencoding('utf-8')
 sim_num = 1000
 model = gensim.models.Word2Vec.load("../../data/wikiDummy2/Dummy_model")
 
-fDictWord = open("../../data/unionDict1000")
+fDictWord = open("../../data/simWoodDict")
 listWords_raw =list(fDictWord)
-
-
-#listWords = listWords[0:100]
-
-# print 'setLegal:',len(wordSet)
-#
-# for word in wordSet:
-#     print word
-#
-# print 'setCharLegal:', len(charSet)
-# print listWords
 
 def loadWord2Vec(filename, dictSet):
     vocab = []
@@ -65,7 +54,7 @@ for i in listWords_raw:
     if len(word_temp) == 2 and word_temp in vocab:
         #print word_temp
         listWords.append(word_temp)
-#listWords = listWords[0:100]
+#listWords = listWords[0:150]
 #
 # #init vocab processor
 max_document_length = 1
@@ -73,7 +62,7 @@ processor = learn.preprocessing.VocabularyProcessor(max_document_length)
 pretrain = processor.fit(vocab)
 y = np.array(list(processor.transform(listWords)))
 print y.shape
-print y
+# print y
 
 max_document_length = 2 * sim_num
 processor = learn.preprocessing.VocabularyProcessor(max_document_length)
@@ -87,7 +76,7 @@ for i in listWords:#每一个i代表一个词，结果需要组织在一个字�
     j = i[0] #j代表一个字
     j_other = i[1]
     if j in model.wv.vocab:
-        for j_sim in model.wv.most_similar(j, sim_num):
+        for j_sim in model.wv.most_similar(j,topn=sim_num):
             # print(j_sim[0] in vocab)
             if j_sim == i:
                 print "Found self "+i
@@ -98,7 +87,7 @@ for i in listWords:#每一个i代表一个词，结果需要组织在一个字�
     j = i[1]  # j代表一个字
     j_other = i[0]
     if j in model.wv.vocab:
-        for j_sim in model.wv.most_similar(j, sim_num):
+        for j_sim in model.wv.most_similar(j, topn=sim_num):
             if j_sim == i:
                 print "Found self "+ i
                 continue
@@ -114,11 +103,12 @@ x_other = np.array(list(processor.transform(other_list)))
 
 print x.shape
 print x_other.shape
+#
+# print x
+# print x_other
 
-print x
-print x_other
-
-samplesize = 500
+whole_size = y.shape[0]
+samplesize = 128
 f_num = 5
 
 with tf.variable_scope("Ez_flat"):
@@ -133,24 +123,33 @@ with tf.variable_scope("Ez_flat"):
     char_embedding_init = charEmbed.assign(char_embedding_placeholder)
 
     xIn = tf.placeholder(tf.int32, [samplesize, max_document_length])
+    xIn2 = tf.placeholder(tf.int32, [samplesize, max_document_length])
     yIn = tf.placeholder(tf.int32, [samplesize,1])
 
     xEmbedRaw = tf.nn.embedding_lookup(charEmbed, xIn)
-    xEmbed = tf.reshape(xEmbedRaw, [-1, max_document_length, embedding_dim, 1])
+    xEmbed = tf.reshape(xEmbedRaw, [-1, max_document_length, embedding_dim])
+
+    xEmbedRaw2 = tf.nn.embedding_lookup(charEmbed, xIn2)
+    xEmbed2 = tf.reshape(xEmbedRaw2, [-1, max_document_length, embedding_dim])
+
     yEmbedRaw = tf.nn.embedding_lookup(wordEmbed, yIn)
     yEmbed = tf.reshape(yEmbedRaw, [-1, embedding_dim])
 
-    W1 = tf.Variable(tf.truncated_normal([2, 1, 1, f_num], stddev=0.1), 'weight1', dtype=tf.float32)
-    #b1 = tf.Variable(np.random.rand(1, 5), 'bias1', dtype=tf.float32)
-    conv1 = tf.nn.conv2d(xEmbed, W1, strides=[1, 1, 1, 1], padding='VALID')#  + b1
-
-
-
-    W3 = tf.Variable(tf.truncated_normal([embedding_dim *( max_document_length - 1) * f_num, embedding_dim], stddev=0.1), 'weight1', dtype=tf.float32)
-    L2_in = tf.matmul(tf.reshape(conv1, [-1, embedding_dim * ( max_document_length - 1) * f_num]), W3)
-    L2_out = tf.nn.sigmoid(L2_in)
+    alpha= tf.reduce_sum(xEmbed * xEmbed2, axis = 2)
+    # alpha_mat = alpha
+    alpha = tf.expand_dims(alpha, -1)
+    # alpha_mat = tf.expand_dims(alpha_mat, -1)
+    # for i in xrange(embedding_dim):
+    #     alpha_mat = tf.stack(alpha, 2)
+    print alpha.get_shape()
+    xAttention_temp = tf.matmul(tf.transpose(xEmbed,perm=[0,2,1]), alpha)
+    xAttention = tf.squeeze(xAttention_temp)
+    W1 = tf.Variable(tf.truncated_normal([embedding_dim, embedding_dim], stddev=0.1), 'weight1', dtype=tf.float32)
+    b1 = tf.Variable(tf.truncated_normal([1, embedding_dim], stddev=0.1), 'bias1', dtype=tf.float32)
+    L2_out = tf.nn.sigmoid(tf.matmul(xAttention, W1) + b1)
 
     loss = tf.reduce_mean((yEmbed - L2_out) ** 2)
+    # loss = tf.reduce_mean(alpha ** 2)
 
 opt = tf.train.AdamOptimizer(0.001)
 train_op = opt.minimize(loss)
@@ -167,19 +166,25 @@ with tf.Session() as sess:
     #xR, yR = sess.run([xEmbed, yEmbed], feed_dict={xIn: x[:samplesize],
     #                                               yIn: y[:samplesize]})
     for cnt in xrange(500000):
-        randList = np.random.randint(0, 6500, size=(1, samplesize))
+        randList = np.random.randint(0, whole_size-1000, size=(1, samplesize))
+
         xSam = x[randList, :]
+        xSam2 = x_other[randList, :]
         ySam = y[randList, :]
-        _, loss_val, y_std, y_out= sess.run([train_op, loss, yEmbed, L2_out],feed_dict={xIn: xSam.reshape(-1,max_document_length),
-                                                   yIn: ySam.reshape(-1,1)})
-        if cnt % 100 == 0:
+        _, loss_val, y_std, y_out, alpha_= sess.run([train_op, loss, yEmbed, L2_out, alpha],feed_dict={xIn: xSam.reshape(-1,max_document_length),
+                                                                                        xIn2: xSam.reshape(-1,max_document_length),
+                                                                                        yIn: ySam.reshape(-1,1)})
+        if cnt % 100   == 0:
             print loss_val
-        if cnt % 1000 == 0:
-            print y_out-y_std
-            randList = np.random.randint(0, vocab_size - 1, size=(1, samplesize))
-            xSam = x[6501:7001]
-            ySam = y[6501:7001]
+        if cnt % 1000 == 0 or cnt < 100:
+            #print y_out-y_std
+            #print alpha_
+            #randList = np.random.randint(whole_size-1000, whole_size, size=(1, samplesize))
+            xSam = x[whole_size - samplesize: whole_size, :]
+            xSam2 = x_other[whole_size - samplesize: whole_size, :]
+            ySam = y[whole_size - samplesize: whole_size, :]
             accu_test = train_accuracy.eval(feed_dict={xIn: xSam.reshape(-1,max_document_length),
+                                                       xIn2: xSam2.reshape(-1, max_document_length),
                                                         yIn: ySam.reshape(-1,1)})
             print 'testAccu', accu_test
 
