@@ -20,7 +20,7 @@ fDictWord = open("../../data/unionDict1000")
 listWords =list(fDictWord)
 listWords = [i.strip().decode() for i in listWords]
 
-model = gensim.models.Word2Vec.load("../../data/wikiDummy4/Dummy_model")
+model = gensim.models.Word2Vec.load("../../data/wikiDummy2/Dummy_model")
 vec_dim = 100
 leave_out = 0
 kmeans_method = 3
@@ -167,13 +167,13 @@ print(mat_sort.count(True))
 # plt.hist(mat2, color= "#00FF00", alpha = .5)
 plt.plot([-1, 0, 1], [0,0,0])
 
-sns.kdeplot(mat, cumulative=True,vertical = True, label = 'nearest', color = '#FF0000', grid= True)
+sns.kdeplot(mat, cumulative=True,vertical = True, label = 'nearest', color = '#FF0000', )
 sns.kdeplot(mat2, cumulative=True,vertical = True, label = 'kmeans',  color = '#00FF00')
 sns.kdeplot(mat3, cumulative=True,vertical = True, label = 'charmean',  color = '#0000FF')
 sns.kdeplot(mat4, cumulative=True,vertical = True, label = 'bestOf3',  color = '#00FFFF')
 sns.kdeplot(np.zeros(len(mat)), cumulative=True,vertical = True, label = 'zero')
 
 plt.show()
-
+0
 sns.kdeplot(np.log10(mat_neatest), cumulative=True,vertical = True, label = 'bestOf3',  color = '#0000FF')
 plt.show()

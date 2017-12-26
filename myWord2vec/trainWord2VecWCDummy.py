@@ -11,8 +11,8 @@ import sys
 import multiprocessing
 import time
 
-from gensim.models import Word2Vec
-from gensim.models.word2vec import LineSentence
+from gensim.models import Word2VecWC
+from gensim.models.word2vecWC import LineSentence
 
 if __name__ == '__main__':
     program = os.path.basename(sys.argv[0])
@@ -26,15 +26,15 @@ if __name__ == '__main__':
     print(CPUcount)
 
     # inp = "../data/wikiDummy/wikiShort"
-    inp = "../data/wikiDummy/wikiDummy"
+    inp = "../data/novel/novel2"
     lines = LineSentence(inp)
     print(lines.max_sentence_length)
     t = time.time()
-    model = Word2Vec(lines, size=100, window=20, min_count=5, workers=10)
+    model = Word2VecWC(lines, size=100, window=20, min_count=10, workers=10)
 
-    model.save("../data/wikiDummy/Dummy_model")
-    model.wv.save_word2vec_format("../data/wikiDummy/Dummy_model_vec",
-                                  "../data/wikiDummy/Dummy_model_voc",
+    model.save("../data/novel/novel2_model")
+    model.wv.save_word2vec_format("../data/novel/novel2_vec",
+                                  "../data/novel/novel2_voc",
                                   binary=False)
     logging.info("The time is %d", time.time() - t)
     result = model.most_similar(u"阿基米德")
