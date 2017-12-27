@@ -9,11 +9,11 @@ sys.setdefaultencoding('utf-8')
 import myWord2vec
 import myWord2vec.Word2VecWC
 
-model = myWord2vec.Word2VecWC.load("../data/novel/novel2_model")
+model = myWord2vec.Word2VecWC.load("../data/novel/novel2_model_pushpull_savetest")
 # model = gensim.models.Word2Vec.load("../data/wikiDummy/Dummy_model")
 
-# testList = [u"钾", u"扒鸡", u"计算机", u"工作", u"本", u"子", u"死", u"美", u"澳",  u"加",  u"求和",  u"历史",  u"惠普"]
-testList = [u'拖拉机']
+testList = [u"钾", u"扒鸡", u"计算机", u"工作", u"本", u"子", u"死", u"美", u"澳",  u"加",  u"求和",  u"历史",  u"惠普"]
+#testList = [u'拖拉机']
 for test in testList:
     print test
     try:

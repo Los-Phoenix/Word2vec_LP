@@ -2,8 +2,23 @@
 import gensim
 import sys
 import numpy as np
+import time
+import matplotlib
+matplotlib.use('Agg')
+
+
 import matplotlib.pyplot as plt
+from matplotlib.pyplot import savefig
 import seaborn as sns
+import random
+import logging
+import os
+
+program = os.path.basename(sys.argv[0])
+
+logger = logging.getLogger(program)
+logging.basicConfig(format='%(asctime)s: %(levelname)s: %(message)s')
+logging.root.setLevel(level=logging.INFO)
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -23,7 +38,9 @@ simListPos = list()
 simListNeg = list()
 
 cnt = 0
-num = 9999999
+num = 40000
+samplesize = 2 * num
+batchsize = 512
 
 for line in linesPos:
     title, w1, w2 = line.split('\t')
@@ -56,7 +73,7 @@ for line in linesDiff:
         print cnt
 
 
-def test():
+def test(i):
     #每到训练次数进行一下测试：
     simListPos = list()
     simListNeg = list()
@@ -66,37 +83,38 @@ def test():
     for w1, w2 in negList:
         simListNeg.append(model.similarity(w1, w2))
 
+    print simListPos[0:batchsize]
+    print simListNeg[0:batchsize]
+
+    plt.clf()
     plt.hist(np.asarray(simListPos), color="#FF0000", alpha=.5)
     plt.hist(np.asarray(simListNeg), color="#0000FF", alpha=.5)
-    plt.show()
+    fileName = "figt" + str(i) + ".png"
+    # savefig("thisfig.png")
+    savefig(fileName)
 
+posSample = random.sample(posList, samplesize)
+negSample = random.sample(negList, samplesize)
 
-
-
-# model.pushpull([[u'人', u'人民']], [[u'人', u'拖拉机']])
-for i in xrange(1000):
-    model.pushpull(posList, [])
-    if i %100 == 0 or i in [1,5,10,50]:
-        # print i
-        test()
+model.wv.init_sims()
+for i in xrange(5):
+    t = time.time()
+    print "Train No.", i
+    posBatch = random.sample(posSample, batchsize)
+    negBatch = random.sample(negSample, batchsize)
+    # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
+    model.pushpullCC(posBatch, [], sample_size = 50000, alpha = 0.01)
+    # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
+    print "used:", time.time() - t, "Seconds"
+    if i %100 == 0 or i < 10:
+        test(i)
 
 print len(simListPos), len(simListNeg)
 
+model = model.save("../../data/novel/novel2_model_pushpull_savetest")
 
 
 
-def test():
-    #每到训练次数进行一下测试：
-    simListPos = list()
-    simListNeg = list()
-    for w1, w2 in posList:
-        simListPos.append(model.similarity(w1, w2))
 
-    for w1, w2 in negList:
-        simListNeg.append(model.similarity(w1, w2))
-
-    plt.hist(np.asarray(simListPos), color="#FF0000", alpha=.5)
-    plt.hist(np.asarray(simListNeg), color="#0000FF", alpha=.5)
-    plt.show()
 
 
