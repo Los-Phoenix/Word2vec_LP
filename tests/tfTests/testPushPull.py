@@ -23,7 +23,8 @@ logging.root.setLevel(level=logging.INFO)
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-model = gensim.models.Word2VecWC.load("../../data/novel/novel2_model")
+model = gensim.models.Word2VecWC.load("../../data/wikiNew/wikiNew_model")
+# model = gensim.models.Word2VecWC(model)
 
 fPos = open("../../data/woodWikiTestPos")
 linesPos = list(fPos)
@@ -39,7 +40,7 @@ simListNeg = list()
 
 cnt = 0
 num = 40000
-samplesize = 2 * num
+samplesize = 3 * num
 batchsize = 512
 
 for line in linesPos:
@@ -89,29 +90,45 @@ def test(i):
     plt.clf()
     plt.hist(np.asarray(simListPos), color="#FF0000", alpha=.5)
     plt.hist(np.asarray(simListNeg), color="#0000FF", alpha=.5)
-    fileName = "figt" + str(i) + ".png"
+    fileName = "figf" + str(i) + ".png"
     # savefig("thisfig.png")
     savefig(fileName)
 
 posSample = random.sample(posList, samplesize)
 negSample = random.sample(negList, samplesize)
 
-model.wv.init_sims()
-for i in xrange(5):
+
+for i in xrange(400):
+    model.wv.init_sims()
     t = time.time()
     print "Train No.", i
     posBatch = random.sample(posSample, batchsize)
     negBatch = random.sample(negSample, batchsize)
     # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
-    model.pushpullCC(posBatch, [], sample_size = 50000, alpha = 0.01)
+    model.pushpullCC(posBatch, negBatch, sample_size = 50000, alpha = 0.0001)
     # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
     print "used:", time.time() - t, "Seconds"
-    if i %100 == 0 or i < 10:
+    if i %10 == 0 or i < 10:
         test(i)
 
 print len(simListPos), len(simListNeg)
 
-model = model.save("../../data/novel/novel2_model_pushpull_savetest")
+model.save("../../data/wikiNew/wikiNew_model__pp")
+
+for i in xrange(4000):
+    model.wv.init_sims()
+    t = time.time()
+    print "Train No.", i
+    posBatch = random.sample(posSample, batchsize)
+    negBatch = random.sample(negSample, batchsize)
+    # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
+    model.pushpullCC(posBatch, negBatch, sample_size = 50000, alpha = 0.001)
+    # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
+    print "used:", time.time() - t, "Seconds"
+    if i %100 == 0 or i < 10:
+        test(i + 1000)
+
+model = model.save("../../data/wikiNew/wikiNew_model_pp_deep")
 
 
 

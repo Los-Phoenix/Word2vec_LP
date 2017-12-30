@@ -26,18 +26,18 @@ if __name__ == '__main__':
     print(CPUcount)
 
     # inp = "../data/wikiDummy/wikiShort"
-    inp = "../data/novel/novel2"
+    inp = "../data/wikiNew/wikiNew"
     lines = LineSentence(inp)
     print(lines.max_sentence_length)
     t = time.time()
-    model = Word2VecWC(lines, size=100, window=20, min_count=10, workers=10)
+    model = Word2VecWC(lines, size=100, window=20, min_count=10, workers=10, iter = 20)
 
-    model.save("../data/novel/novel2_model")
-    model.wv.save_word2vec_format("../data/novel/novel2_vec",
-                                  "../data/novel/novel2_voc",
+    model.save("../data/wikiNew/wikiNew_model")
+    model.wv.save_word2vec_format("../data/wikiNew/wikiNew_vec",
+                                  "../data/wikiNew/wikiNew_voc",
                                   binary=False)
     logging.info("The time is %d", time.time() - t)
-    result = model.most_similar(u"阿基米德")
+    result = model.most_similar(u"伏特加")
     #print(result)
     for e in result:
         print(e[0], e[1])

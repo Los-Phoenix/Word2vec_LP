@@ -7,7 +7,7 @@
 #先把词频表装入map
 #再对字典遍历
 
-f_vocab = open("zh_novel_model_100_voc")
+f_vocab = open("../data/wikiNew/wikiNew_voc")
 listVocab = list(f_vocab)
 f_vocab.close()
 
@@ -15,7 +15,7 @@ f_dict = open("simWoodDict")
 listDict = list(f_dict)
 f_dict.close()
 
-f_dicttime = open("dictCountNovel", 'w')
+f_dicttime = open("dictCountWikiNew", 'w')
 
 words = []
 times = []
