@@ -9,10 +9,18 @@ sys.setdefaultencoding('utf-8')
 import myWord2vec
 import myWord2vec.Word2VecWC
 
-model = myWord2vec.Word2VecWC.load("../data/wikiNew/wikiNew_model")
-model2 = gensim.models.Word2Vec.load("../data/wikiNew/wikiNew_model__pp")
+model = gensim.models.Word2Vec.load("../data/wikiDummy4/Dummy_model")
+model2 = gensim.models.Word2Vec.load("../data/wikiDummy2/Dummy_model")
 
-testList = [u"手机", u"伏特加", u"法律", u"李白", u"本", u"子", u"死", u"美", u"澳",  u"加",  u"求和",  u"历史",  u"惠普"]
+testList = [u"吸血鬼",
+u"时间性",
+u"猛扑",
+u"给以",
+u"惊心掉胆",
+u"行李架",
+u"检察官法",
+u"初审",
+u"翻车鱼"]
 #testList = [u'拖拉机']
 for test in testList:
     print test

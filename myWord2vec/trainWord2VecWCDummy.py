@@ -30,14 +30,14 @@ if __name__ == '__main__':
     lines = LineSentence(inp)
     print(lines.max_sentence_length)
     t = time.time()
-    model = Word2VecWC(lines, size=100, window=20, min_count=10, workers=10, iter = 20)
+    model = Word2VecWC(lines, size=100, window=20, min_count=3, workers=10, iter = 20)
 
-    model.save("../data/wikiNew/wikiNew_model")
-    model.wv.save_word2vec_format("../data/wikiNew/wikiNew_vec",
-                                  "../data/wikiNew/wikiNew_voc",
+    model.save("../data/wikiNew2/wikiNew_model")
+    model.wv.save_word2vec_format("../data/wikiNew2/wikiNew_vec",
+                                  "../data/wikiNew2/wikiNew_voc",
                                   binary=False)
     logging.info("The time is %d", time.time() - t)
-    result = model.most_similar(u"伏特加")
+    result = model.most_similar(u"阿基米德")
     #print(result)
     for e in result:
         print(e[0], e[1])

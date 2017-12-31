@@ -23,7 +23,7 @@ logging.root.setLevel(level=logging.INFO)
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-model = gensim.models.Word2VecWC.load("../../data/wikiNew/wikiNew_model")
+model = gensim.models.Word2VecWC.load("../../data/wikiNew2/wikiNew_model")
 # model = gensim.models.Word2VecWC(model)
 
 fPos = open("../../data/woodWikiTestPos")
@@ -90,7 +90,7 @@ def test(i):
     plt.clf()
     plt.hist(np.asarray(simListPos), color="#FF0000", alpha=.5)
     plt.hist(np.asarray(simListNeg), color="#0000FF", alpha=.5)
-    fileName = "figf" + str(i) + ".png"
+    fileName = "figfn" + str(i) + ".png"
     # savefig("thisfig.png")
     savefig(fileName)
 
@@ -105,7 +105,7 @@ for i in xrange(400):
     posBatch = random.sample(posSample, batchsize)
     negBatch = random.sample(negSample, batchsize)
     # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
-    model.pushpullCC(posBatch, negBatch, sample_size = 50000, alpha = 0.0001)
+    model.pushpullCC(posBatch, negBatch, sample_size = 500, alpha = 0.01)
     # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
     print "used:", time.time() - t, "Seconds"
     if i %10 == 0 or i < 10:
@@ -113,7 +113,7 @@ for i in xrange(400):
 
 print len(simListPos), len(simListNeg)
 
-model.save("../../data/wikiNew/wikiNew_model__pp")
+model.save("../../data/wikiNew2/wikiNew_model__pp")
 
 for i in xrange(4000):
     model.wv.init_sims()
@@ -122,13 +122,13 @@ for i in xrange(4000):
     posBatch = random.sample(posSample, batchsize)
     negBatch = random.sample(negSample, batchsize)
     # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
-    model.pushpullCC(posBatch, negBatch, sample_size = 50000, alpha = 0.001)
+    model.pushpullCC(posBatch, negBatch, sample_size = 500, alpha = 0.01)
     # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
     print "used:", time.time() - t, "Seconds"
     if i %100 == 0 or i < 10:
-        test(i + 1000)
+        test(i + 400)
 
-model = model.save("../../data/wikiNew/wikiNew_model_pp_deep")
+model = model.save("../../data/wikiNew2/wikiNew_model_pp_deep")
 
 
 

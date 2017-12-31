@@ -22,7 +22,7 @@ def is_chinese(uchar):
 #再每一行跟字典进行对比
 #结果输出到同一目录下得wikiNew
 
-fLegal = open("legalWords.txt")
+fLegal = open("../../data/legalWords.txt")
 linesLegal = list(fLegal)
 legalWords = [i.decode().split('\t') for i in linesLegal]
 intcnt = 0
@@ -38,16 +38,45 @@ legalSet.add(u"阿基米德")
 
 
 
-for i in legalSet:
-    print i
+# for i in legalSet:
+#     print i
 print len(legalSet)
 
-fSimDict = open("")
+fSimDict = list(open("../../data/simWoodDict"))
+legalSimSet = set([i.decode().strip() for i in fSimDict])
+# for i in legalSimSet:
+#     print i
+print len(legalSimSet)
 
+fSimDict240 = list(open("../../data/240.txt"))
+legalSimSet240 = set()
+for i in fSimDict240:
+    w0, w1, _ = i.decode().split('\t')
+    legalSimSet240.add(w0)
+    legalSimSet240.add(w1)
 
-exit(0)
-wikiF = open("wikiDummy", 'r')
-outF = open("wikiNew", 'w')
+print len(legalSimSet240)
+
+fSimDict297 = list(open("../../data/297.txt"))
+legalSimSet297 = set()
+for i in fSimDict297:
+    w0, w1, _ = i.decode().split('\t')
+    legalSimSet297.add(w0)
+    legalSimSet297.add(w1)
+
+print len(legalSimSet297)
+
+print"ori        :", len(legalSet)
+legalSet = legalSet.union(legalSimSet)
+print"add simWood:", len(legalSet)
+legalSet = legalSet.union(legalSimSet240)
+print"add 240:", len(legalSet)
+legalSet = legalSet.union(legalSimSet297)
+print"add 297:", len(legalSet)
+
+hitSet = set()
+wikiF = open("../../data/wikiNew2/wikiDummy", 'r')
+outF = open("../../data/wikiNew2/wikiNew", 'w')
 
 wikiL = list(wikiF)
 
@@ -70,7 +99,7 @@ for linesRaw in wikiL:
                 cnt += 1
         else:#Longer words
             if word in legalSet:
-
+                hitSet.add(word)
                 str += word
                 str += " "
                 cnt += 1
@@ -100,97 +129,15 @@ outF.close()
 
 print len(wikiL)
 
-#
-#
-# for i in legalSet:
-#     print i
-# def convert(fname):#把一个文件中的内容变成一行字符串。注意是一行！！
-#
-#     infile = file(fname, 'rb')
-#     sents = infile.read();
-#     infile.close()
-#     strBuffer = sents.decode('gbk', 'ignore')
-#     strs = []
-#     str = ""
-#     cnt = 0
-#     for oneWord in strBuffer:
-#         cnt += 1
-#         if cnt % 100000 == 0:
-#             print "read " + cnt.__str__() + " words"
-#         if cnt % 2000 == 0:
-#             str = ' '.join(str.split())+"\n"
-#             strs.append(str.encode('UTF-8'))
-#             str = ""
-#
-#         if is_chinese(oneWord):
-#             str += oneWord
-#         else:
-#             str += " "
-#
-#     return strs
-#
-#
-# # converts all pdfs in directory pdfDir, saves all resulting txt files to txtdir
-# def convertMultiple(textFileDir, txtName):
-#     # if textFileDir == "":
-#     #     textFileDir = os.getcwd() + "\\"  # if no textFileDir passed in
-#
-#     fileDirList = os.listdir(textFileDir)
-#     for textFile in fileDirList:  # iterate through pdfs in pdf directory
-#         fileExtension = textFile.split(".")[-1]
-#         temptextFileDir = textFileDir + "/" + textFile
-#         if fileExtension == "txt":
-#             textFileFilename = textFileDir + "/" + textFile
-#
-#             print "Converting" + textFileFilename.decode('GBK')
-#
-#             strs = convert(textFileFilename)  # get string of text content of textFile
-#             #textFilename = txtDir + "/" + textFile + ".txt"
-#             textFile = open(txtName, "a")  # make text file
-#             for str in strs:
-#                 textFile.write(str)  # write text to text file
-#             textFile.close()
-#
-#         elif os.path.isdir(temptextFileDir):
-#             print "Entering Dir: " + temptextFileDir.decode('GBK')
-#             textFileDirName = temptextFileDir
-#             #txtDirName = txtDir + "/" + textFile
-#             # create same Dir for txt
-#             #if not os.path.isdir(txtDirName):
-#             #    os.mkdir(txtDirName)
-#             # Do same in son Dir, not too many layers
-#             convertMultiple(textFileDirName, txtName)
-#
-#
-# # i : info
-# # p : pdfDir
-# # t = txtDir
-# def main(argv):
-#     # pdfDir = ""
-#     # txtDir = ""
-#     # try:
-#     #     opts, args = getopt.getopt(argv, "ip:t:")
-#     # except getopt.GetoptError:
-#     #     print("pdfToT.py -p <pdfdirectory> -t <textdirectory>")
-#     #     sys.exit(2)
-#     # for opt, arg in opts:
-#     #     if opt == "-i":
-#     #         print("pdfToT.py -p <pdfdirectory> -t <textdirectory>")
-#     #         sys.exit()
-#     #     elif opt == "-p":
-#     #         pdfDir = arg
-#     #     elif opt == "-t":
-#     #         txtDir = arg
-#
-#     pdfDir = "./novel"# + unicode(pdfDir, "UTF-8")
-#     txtName = "./novelOne/novelOne.text"# + unicode(txtDir, "UTF-8")
-#
-#     convertMultiple(pdfDir, txtName)
-#
-# if __name__ == "__main__":
-#     main(sys.argv[1:])
-
-
+inter = legalSet.difference(hitSet)
+print "not Hit:"
+q = inter.copy()
+for i in q:
+    if len(i) == 1:
+        inter.remove(i)
+    else:
+        print i
+print len(inter)
 
 
 
