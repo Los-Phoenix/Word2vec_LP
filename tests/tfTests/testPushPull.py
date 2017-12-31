@@ -26,10 +26,10 @@ sys.setdefaultencoding('utf-8')
 model = gensim.models.Word2VecWC.load("../../data/wikiNew2/wikiNew_model")
 # model = gensim.models.Word2VecWC(model)
 
-fPos = open("../../data/woodWikiTestPos")
+fPos = open("../../data/Same2")
 linesPos = list(fPos)
 
-fDiff = open("../../data/woodWikiTestDiffClass")
+fDiff = open("../../data/woodWikiTestDiffClass1000")
 linesDiff = list(fDiff)
 
 posList = list()
@@ -39,9 +39,10 @@ simListPos = list()
 simListNeg = list()
 
 cnt = 0
-num = 40000
+num = 9999999
+negNum = 10000
 samplesize = 3 * num
-batchsize = 512
+batchsize = 1024
 
 for line in linesPos:
     title, w1, w2 = line.split('\t')
@@ -68,17 +69,20 @@ for line in linesDiff:
         simListNeg.append(model.similarity(w1, w2))
         cnt += 1
 
-    if cnt > num * 6:
+    if cnt > num * 3 + negNum:
         break
     if cnt % 1000 == 0:
-        print cnt
+        print "Neg:", cnt
 
+print len(negList)
+
+negList = random.sample(negList, 10000)
 
 def test(i):
     #每到训练次数进行一下测试：
     simListPos = list()
     simListNeg = list()
-    for w1, w2 in posList:
+    for w1, w2 in random.sample(posSample, 10000):
         simListPos.append(model.similarity(w1, w2))
 
     for w1, w2 in negList:
@@ -90,13 +94,15 @@ def test(i):
     plt.clf()
     plt.hist(np.asarray(simListPos), color="#FF0000", alpha=.5)
     plt.hist(np.asarray(simListNeg), color="#0000FF", alpha=.5)
-    fileName = "figfn" + str(i) + ".png"
+    fileName = "figK" + str(i) + ".png"
     # savefig("thisfig.png")
     savefig(fileName)
 
-posSample = random.sample(posList, samplesize)
-negSample = random.sample(negList, samplesize)
+# posSample = random.sample(posList, samplesize)
+# negSample = random.sample(negList, samplesize)
 
+posSample = posList
+negSample = negList
 
 for i in xrange(500):
     model.wv.init_sims()
@@ -105,7 +111,7 @@ for i in xrange(500):
     posBatch = random.sample(posSample, batchsize)
     negBatch = random.sample(negSample, batchsize)
     # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
-    model.pushpullCC(posBatch, negBatch, sample_size = 5000, alpha = 0.005)
+    model.pushpullCC(posBatch, [], sample_size = 1000, alpha = 0.05)
     # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
     print "used:", time.time() - t, "Seconds"
     if i %10 == 0 or i < 10:
@@ -120,13 +126,14 @@ for i in xrange(500):
     posBatch = random.sample(posSample, batchsize)
     negBatch = random.sample(negSample, batchsize)
     # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
-    model.pushpullCC(posBatch, negBatch, sample_size = 5000, alpha = 0.005)
+    model.pushpullCC(posBatch, [], sample_size = 1000, alpha = 0.05)
     # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
     print "used:", time.time() - t, "Seconds"
     if i %100 == 0 or i < 10:
         test(i + 500)
 
 model.save("../../data/wikiNew2/wikiNew_model_1000")
+exit(0)
 
 for i in xrange(1000):
     model.wv.init_sims()
@@ -135,7 +142,7 @@ for i in xrange(1000):
     posBatch = random.sample(posSample, batchsize)
     negBatch = random.sample(negSample, batchsize)
     # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
-    model.pushpullCC(posBatch, negBatch, sample_size = 5000, alpha = 0.005)
+    model.pushpullCC(posBatch, [], sample_size = 5000, alpha = 0.005)
     # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
     print "used:", time.time() - t, "Seconds"
     if i %100 == 0 or i < 10:

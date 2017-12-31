@@ -10,19 +10,19 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 #加载词典
-vocab = open("../../v1/zh_model_200_all_voc")
+vocab = open("../../data/wikiNew2/wikiNew_voc")
 listVocab = list(vocab)
 vocab.close()
 vocabSet = set(list([i.split(' ')[0] for i in listVocab]))
 
-
+maxLine = 999999
 #加载同义词词林
-f_wood = open("../../v1/simWood.txt")#这是同义词词林
+f_wood = open("../../data/simWood.txt")#这是同义词词林
 listWood = list(f_wood)
 f_wood.close()
 
 #打开写入文件
-f_rst = open("woodWikiTestPos1000", 'w')
+f_rst = open("../../data/Same2", 'w')
 cnt = 0
 #遍历同义词词林
 cntline = 0
@@ -33,10 +33,10 @@ for line in listWood:#词林中的每一行
     words = words[1:]
     # 对于一行
     # 不是同义行跳出
-    if not title.endswith('='):
+    if title.endswith('@'):
         continue
     cntline += 1
-    if cntline > 1000:
+    if cntline > maxLine:
         break;
     # print title
     #对于一个词
