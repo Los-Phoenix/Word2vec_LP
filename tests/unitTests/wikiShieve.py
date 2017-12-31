@@ -67,13 +67,18 @@ for i in fSimDict297:
 print len(legalSimSet297)
 
 print"ori        :", len(legalSet)
+
+print(u"互联网" in legalSet)
 legalSet = legalSet.union(legalSimSet)
+
 print"add simWood:", len(legalSet)
 legalSet = legalSet.union(legalSimSet240)
 print"add 240:", len(legalSet)
 legalSet = legalSet.union(legalSimSet297)
 print"add 297:", len(legalSet)
 
+
+exit(0)
 hitSet = set()
 wikiF = open("../../data/wikiNew2/wikiDummy", 'r')
 outF = open("../../data/wikiNew2/wikiNew", 'w')

@@ -10,18 +10,21 @@ import myWord2vec
 import myWord2vec.Word2VecWC
 
 model = gensim.models.Word2VecWC.load("../data/wikiNew2/wikiNew_model")
-model2 = gensim.models.Word2VecWC.load("../data/wikiNew2/wikiNew_model__pp")
-model3 = gensim.models.Word2VecWC.load("../data/wikiNew2/wikiNew_model_pp_deep")
+model2 = gensim.models.Word2VecWC.load("../data/wikiNew2/wikiNew_model_500")
+model3 = gensim.models.Word2VecWC.load("../data/wikiNew2/wikiNew_model_1000")
 
-fSimDict240 = list(open("../data/297.txt"))
-legalSimSet240 = set()
-for i in fSimDict240:
+fSimDict297 = list(open("../data/297.txt"))
+legalSimSet297 = set()
+for i in fSimDict297:
     w0, w1, _ = i.decode().split('\t')
-    legalSimSet240.add(w0)
-    legalSimSet240.add(w1)
+    legalSimSet297.add(w0)
+    legalSimSet297.add(w1)
+
+
+print(u"互联网" in model)
 
 #testList = [u'拖拉机']
-for test in legalSimSet240:
+for test in legalSimSet297:
     print test
     try:
         result = model.wv.most_similar(test)

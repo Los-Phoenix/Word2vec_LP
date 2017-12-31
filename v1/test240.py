@@ -10,8 +10,8 @@ import myWord2vec
 import myWord2vec.Word2VecWC
 
 model = gensim.models.Word2VecWC.load("../data/wikiNew2/wikiNew_model")
-model2 = gensim.models.Word2VecWC.load("../data/wikiNew2/wikiNew_model__pp")
-model3 = gensim.models.Word2VecWC.load("../data/wikiNew2/wikiNew_model_pp_deep")
+model2 = gensim.models.Word2VecWC.load("../data/wikiNew2/wikiNew_model_500")
+model3 = gensim.models.Word2VecWC.load("../data/wikiNew2/wikiNew_model_1000")
 
 fSimDict240 = list(open("../data/240.txt"))
 legalSimSet240 = set()

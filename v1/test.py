@@ -12,15 +12,17 @@ import myWord2vec.Word2VecWC
 model = gensim.models.Word2Vec.load("../data/wikiDummy4/Dummy_model")
 model2 = gensim.models.Word2Vec.load("../data/wikiDummy2/Dummy_model")
 
-testList = [u"吸血鬼",
-u"时间性",
+print model.wv.vocab[u"互联网"]
+
+testList = [u"互联网",
+u"美国人",
 u"猛扑",
 u"给以",
 u"惊心掉胆",
 u"行李架",
 u"检察官法",
 u"初审",
-u"翻车鱼"]
+u"江"]
 #testList = [u'拖拉机']
 for test in testList:
     print test

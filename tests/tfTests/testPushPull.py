@@ -98,38 +98,80 @@ posSample = random.sample(posList, samplesize)
 negSample = random.sample(negList, samplesize)
 
 
-for i in xrange(400):
+for i in xrange(500):
     model.wv.init_sims()
     t = time.time()
     print "Train No.", i
     posBatch = random.sample(posSample, batchsize)
     negBatch = random.sample(negSample, batchsize)
     # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
-    model.pushpullCC(posBatch, negBatch, sample_size = 500, alpha = 0.01)
+    model.pushpullCC(posBatch, negBatch, sample_size = 5000, alpha = 0.005)
     # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
     print "used:", time.time() - t, "Seconds"
     if i %10 == 0 or i < 10:
         test(i)
 
-print len(simListPos), len(simListNeg)
+model.save("../../data/wikiNew2/wikiNew_model_500")
 
-model.save("../../data/wikiNew2/wikiNew_model__pp")
-
-for i in xrange(4000):
+for i in xrange(500):
     model.wv.init_sims()
     t = time.time()
-    print "Train No.", i
+    print "Train No.", i+500
     posBatch = random.sample(posSample, batchsize)
     negBatch = random.sample(negSample, batchsize)
     # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
-    model.pushpullCC(posBatch, negBatch, sample_size = 500, alpha = 0.01)
+    model.pushpullCC(posBatch, negBatch, sample_size = 5000, alpha = 0.005)
     # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
     print "used:", time.time() - t, "Seconds"
     if i %100 == 0 or i < 10:
-        test(i + 400)
+        test(i + 500)
 
-model = model.save("../../data/wikiNew2/wikiNew_model_pp_deep")
+model.save("../../data/wikiNew2/wikiNew_model_1000")
 
+for i in xrange(1000):
+    model.wv.init_sims()
+    t = time.time()
+    print "Train No.", i + 1000
+    posBatch = random.sample(posSample, batchsize)
+    negBatch = random.sample(negSample, batchsize)
+    # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
+    model.pushpullCC(posBatch, negBatch, sample_size = 5000, alpha = 0.005)
+    # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
+    print "used:", time.time() - t, "Seconds"
+    if i %100 == 0 or i < 10:
+        test(i + 1000)
+
+model.save("../../data/wikiNew2/wikiNew_model_2000")
+
+for i in xrange(1000):
+    model.wv.init_sims()
+    t = time.time()
+    print "Train No.", i + 2000
+    posBatch = random.sample(posSample, batchsize)
+    negBatch = random.sample(negSample, batchsize)
+    # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
+    model.pushpullCC(posBatch, negBatch, sample_size = 5000, alpha = 0.005)
+    # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
+    print "used:", time.time() - t, "Seconds"
+    if i %100 == 0 or i < 10:
+        test(i + 2000)
+
+model.save("../../data/wikiNew2/wikiNew_model_3000")
+
+for i in xrange(7000):
+    model.wv.init_sims()
+    t = time.time()
+    print "Train No.", i + 3000
+    posBatch = random.sample(posSample, batchsize)
+    negBatch = random.sample(negSample, batchsize)
+    # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
+    model.pushpullCC(posBatch, negBatch, sample_size = 5000, alpha = 0.005)
+    # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
+    print "used:", time.time() - t, "Seconds"
+    if i %100 == 0 or i < 10:
+        test(i + 3000)
+
+model.save("../../data/wikiNew2/wikiNew_model_10000")
 
 
 

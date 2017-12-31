@@ -26,7 +26,7 @@ if __name__ == '__main__':
     print(CPUcount)
 
     # inp = "../data/wikiDummy/wikiShort"
-    inp = "../data/wikiNew/wikiNew"
+    inp = "../data/wikiNew2/wikiNew"
     lines = LineSentence(inp)
     print(lines.max_sentence_length)
     t = time.time()
