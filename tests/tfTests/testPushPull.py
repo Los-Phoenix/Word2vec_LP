@@ -24,7 +24,6 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 model = gensim.models.Word2VecWC.load("../../data/wikiNew2/wikiNew_model")
-# model = gensim.models.Word2VecWC(model)
 
 fPos = open("../../data/Same2")
 linesPos = list(fPos)
@@ -98,9 +97,6 @@ def test(i):
     # savefig("thisfig.png")
     savefig(fileName)
 
-# posSample = random.sample(posList, samplesize)
-# negSample = random.sample(negList, samplesize)
-
 posSample = posList
 negSample = negList
 
@@ -111,7 +107,7 @@ for i in xrange(500):
     posBatch = random.sample(posSample, batchsize)
     negBatch = random.sample(negSample, batchsize)
     # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
-    model.pushpullCC(posBatch, [], sample_size = 1000, alpha = 0.05)
+    model.pushpullCC(posBatch, [], posDict, sample_size = 1000, alpha = 0.05)
     # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
     print "used:", time.time() - t, "Seconds"
     if i %10 == 0 or i < 10:
@@ -126,7 +122,7 @@ for i in xrange(500):
     posBatch = random.sample(posSample, batchsize)
     negBatch = random.sample(negSample, batchsize)
     # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
-    model.pushpullCC(posBatch, [], sample_size = 1000, alpha = 0.05)
+    model.pushpullCC(posBatch, [], posDict, sample_size = 1000, alpha = 0.05)
     # model.pushpull(posBatch, negBatch, sample_size = 500, alpha = 0.001)
     print "used:", time.time() - t, "Seconds"
     if i %100 == 0 or i < 10:

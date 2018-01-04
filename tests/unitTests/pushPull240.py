@@ -13,9 +13,9 @@ sys.setdefaultencoding('utf-8')
 
 fSimDict240 = list(open("../../data/240.txt"))
 
-model0 = gensim.models.Word2VecWC.load("../../data/wikiNew2/wikiNew_model")
-model500 = gensim.models.Word2VecWC.load("../../data/wikiNew2/wikiNew_model_500")
-model1000 = gensim.models.Word2VecWC.load("../../data/wikiNew2/wikiNew_model_1000")
+model0 = gensim.models.Word2VecWC.load("../../data/novel/novelS_model")
+model500 = gensim.models.Word2VecWC.load("../../data/novel/novelS_model_500")
+model1000 = gensim.models.Word2VecWC.load("../../data/novel/novelS_model_1000")
 
 list240 = list()
 listsim0 = list()

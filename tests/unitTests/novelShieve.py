@@ -80,8 +80,8 @@ print"add 297:", len(legalSet)
 
 #exit(0)
 hitSet = set()
-wikiF = open("../../data/wikiShort2/wikiShort2", 'r')
-outF = open("../../data/wikiShort2/wikiShort", 'w')
+wikiF = open("../../data/novel/novel2", 'r')
+outF = open("../../data/novel/novelS", 'w')
 
 wikiL = list(wikiF)
 
