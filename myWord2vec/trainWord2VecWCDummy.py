@@ -11,8 +11,17 @@ import sys
 import multiprocessing
 import time
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 from gensim.models import Word2VecWC
 from gensim.models.word2vecWC import LineSentence
+
+folder_path = "../data/wiki_phrase/"
+ori_name = "wiki"
+model_suffix = "_model"
+vec_suffix = "_vec"
+voc_suffix = "_voc"
 
 if __name__ == '__main__':
     program = os.path.basename(sys.argv[0])
@@ -26,15 +35,15 @@ if __name__ == '__main__':
     print(CPUcount)
 
     # inp = "../data/wikiDummy/wikiShort"
-    inp = "../data/novel/novelS"
+    inp = folder_path + ori_name
     lines = LineSentence(inp)
     print(lines.max_sentence_length)
     t = time.time()
-    model = Word2VecWC(lines, size=25, window=5, min_count=3, workers=10, sg = True, iter = 2)
+    model = Word2VecWC(lines, size=52, window=5, min_count=3, workers=10, iter = 2)
 
-    model.save("../data/novel/novelS_model")
-    model.wv.save_word2vec_format("../data/novel/novelS_vec",
-                                  "../data/novel/novelS_voc",
+    model.save(folder_path + ori_name + model_suffix)
+    model.wv.save_word2vec_format(folder_path + ori_name + vec_suffix,
+                                  folder_path + ori_name + voc_suffix,
                                   binary=False)
     logging.info("The time is %d", time.time() - t)
     result = model.most_similar(u"阿基米德")

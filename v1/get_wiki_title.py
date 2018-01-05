@@ -28,12 +28,13 @@ if __name__ == '__main__':
         sys.exit(1)
 
     inp = '../data/zhwiki.xml.bz2'
-    outp = 'zhwiki.txt'
+    outp = '../data/zhwiki.txt'
     space = " "
     i = 0
 
     output = open(outp, 'w')
     wiki = WikiCorpus(inp, lemmatize=False, dictionary={}, )
+
     for text in wiki.get_texts():
         if six.PY3:
             output.write(bytes(' '.join(text), 'utf-8').decode('utf-8') + '\n')
@@ -41,10 +42,12 @@ if __name__ == '__main__':
         #    output.write(
         #            space.join(map(lambda x:x.decode("utf-8"), text)) + '\n')
         else:
-            output.write(space.join(text) + "\n")
+            output.write(text[1][1] + "\n")
         i = i + 1
         if (i % 10000 == 0):
             logger.info("Saved " + str(i) + " articles")
+        # if i == 1000:
+        #     break
 
     output.close()
     logger.info("Finished Saved " + str(i) + " articles")

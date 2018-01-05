@@ -6,14 +6,15 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
+    if False:
         print("python jiebaShow inFile outFile")
         sys.exit(1)
-    inp, outp = sys.argv[1:3]
+    inp = "../data/wikiToSeg"
+    outp = "../data/wikiSegged"
     space = " "
     i = 0
 
-    jieba.load_userdict("simWoodDict")
+    jieba.load_userdict("../data/slimDict")
 
     output = open(outp, 'w')
     lineArray = list(open(inp, "r").readlines());

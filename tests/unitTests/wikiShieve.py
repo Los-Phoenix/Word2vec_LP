@@ -22,71 +22,27 @@ def is_chinese(uchar):
 #再每一行跟字典进行对比
 #结果输出到同一目录下得wikiNew
 
-fLegal = open("../../data/legalWords.txt")
+fLegal = open("../../data/slimDict")
 linesLegal = list(fLegal)
-legalWords = [i.decode().split('\t') for i in linesLegal]
-intcnt = 0
+legalSet = set([i.decode().strip() for i in linesLegal])
 fLegal.close()
-legalSet = set()
-
-for i in legalWords:
-    legalSet = legalSet.union(set(i))
-
-legalSet.add(u"阿爸")
-legalSet.add(u"阿基米德")
 
 
 
-
-# for i in legalSet:
-#     print i
 print len(legalSet)
 
-fSimDict = list(open("../../data/simWoodDict"))
-legalSimSet = set([i.decode().strip() for i in fSimDict])
-# for i in legalSimSet:
-#     print i
-print len(legalSimSet)
-
-fSimDict240 = list(open("../../data/240.txt"))
-legalSimSet240 = set()
-for i in fSimDict240:
-    w0, w1, _ = i.decode().split('\t')
-    legalSimSet240.add(w0)
-    legalSimSet240.add(w1)
-
-print len(legalSimSet240)
-
-fSimDict297 = list(open("../../data/297.txt"))
-legalSimSet297 = set()
-for i in fSimDict297:
-    w0, w1, _ = i.decode().split('\t')
-    legalSimSet297.add(w0)
-    legalSimSet297.add(w1)
-
-print len(legalSimSet297)
-
-print"ori        :", len(legalSet)
-
-print(u"互联网" in legalSet)
-legalSet = legalSet.union(legalSimSet)
-
-print"add simWood:", len(legalSet)
-legalSet = legalSet.union(legalSimSet240)
-print"add 240:", len(legalSet)
-legalSet = legalSet.union(legalSimSet297)
-print"add 297:", len(legalSet)
-
-
-#exit(0)
 hitSet = set()
-wikiF = open("../../data/wikiShort2/wikiShort2", 'r')
-outF = open("../../data/wikiShort2/wikiShort", 'w')
+wikiF = open("../../data/wikiSegged", 'r')
+outF = open("../../data/wikiShieved", 'w')
 
 wikiL = list(wikiF)
 
 sent_cnt = 0
 line_cnt = 0
+
+testStr = u"阿基米德"
+testStr = u"阿斯顿发生"
+
 for linesRaw in wikiL:
     line_cnt += 1
     lines = linesRaw.decode()
@@ -103,7 +59,14 @@ for linesRaw in wikiL:
                 str += " "
                 cnt += 1
         else:#Longer words
+            if word.find(testStr) > -1:
+                print word
+                print testStr in legalSet
+                print"URIKA!!\n\n"
+
             if word in legalSet:
+                if word == testStr:
+                    print"URIKA!!\n\n"
                 hitSet.add(word)
                 str += word
                 str += " "
@@ -116,7 +79,7 @@ for linesRaw in wikiL:
             cnt = 0
             sent_cnt += 1
 
-    if len(str) >= 100:#Too short
+    if len(str) >= 100:#Not Too short
         str += "\n"
         outF.write(str)
         sent_cnt += 1

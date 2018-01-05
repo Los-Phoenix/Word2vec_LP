@@ -9,10 +9,15 @@ sys.setdefaultencoding('utf-8')
 import myWord2vec
 import myWord2vec.Word2VecWC
 
-model = gensim.models.Word2Vec.load("../data/wikiDummy4/Dummy_model")
-model2 = gensim.models.Word2Vec.load("../data/wikiDummy2/Dummy_model")
+folder_path = "../data/wiki_phrase/"
+ori_name = "wiki"
+model_suffix = "_model"
+vec_suffix = "_vec"
+voc_suffix = "_voc"
 
-print model.wv.vocab[u"互联网"]
+model = gensim.models.Word2VecWC.load(folder_path + ori_name + model_suffix)
+
+#print model.wv.vocab[u"互联网"]
 
 testList = [u"互联网",
 u"美国人",
@@ -28,16 +33,12 @@ for test in testList:
     print test
     try:
         result = model.wv.most_similar(test)
-        result2 = model2.wv.most_similar(test)
+
         #print(result)
         for e in result:
             print e[0], e[1]
 
         print '==='
 
-        for e in result2:
-            print e[0], e[1]
-
-        print ' '
     except:
         print '?'
