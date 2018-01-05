@@ -17,7 +17,7 @@ sys.setdefaultencoding('utf-8')
 from gensim.models import Word2VecWC
 from gensim.models.word2vecWC import LineSentence
 
-folder_path = "../data/wiki_phrase/"
+folder_path = "../data/wiki_phrase2/"
 ori_name = "wiki"
 model_suffix = "_model"
 vec_suffix = "_vec"
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     lines = LineSentence(inp)
     print(lines.max_sentence_length)
     t = time.time()
-    model = Word2VecWC(lines, size=52, window=5, min_count=3, workers=10, iter = 2)
+    model = Word2VecWC(lines, size=60, window=10, min_count=3, workers=10, iter = 20)
 
     model.save(folder_path + ori_name + model_suffix)
     model.wv.save_word2vec_format(folder_path + ori_name + vec_suffix,
