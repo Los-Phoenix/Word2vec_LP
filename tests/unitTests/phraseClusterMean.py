@@ -29,33 +29,10 @@ for line in voc_list:
     else:
         longSet.add(word)
 
-print "uniSet", len(uniSet)
-print "biTriSet", len(biTriSet)
-print "quadSet", len(quadSet)
-print "longSet", len(longSet)
-
 wordSet = biTriSet.union(quadSet).union(longSet)
 
-#longSet 中 包含两个以上bitri的才叫词组
-#我们先看看有多少个词组：
 phraseList = list()
 plist = list()
-# for p in longSet:
-#     pSubList = list()
-#     # print p
-#     len_p = len(p)
-#     for start in xrange(len_p):
-#         for length in xrange(len_p - start + 1):
-#             if p[start: start+length] in biTriSet:
-#                 pSubList.append(p[start: start+length])
-#
-#     if len(pSubList) > 1:#This phrase has many sub parts
-#         phraseList.append(p)
-#         plist.append(pSubList)
-#
-# pDict = dict(zip(phraseList, plist))
-
-# longSet = random.sample(longSet, 20)
 
 for p in longSet:
     pSubList = list()
@@ -73,9 +50,32 @@ for p in longSet:
 
 pDict = dict(zip(phraseList, plist))
 
-print len(pDict)
-for k in pDict.keys():
-    print k
-    for s in pDict[k]:
-        print "  ", s
+pop_num = 2000
+
+samP = random.sample(pDict.keys(), pop_num)
+samS = random.sample(biTriSet, pop_num)
+#先看answer at
+for phrase in samP:
+    print phrase
+
+    charList = list(phrase)
+    sonList = pDict[phrase]
+    leftList = list()
+    for char in charList:
+        leftList.append(char)
+
+    for son in sonList:
+        leftList.append(son)
+        for char in son:
+            if char in leftList:
+                leftList.remove(char)
+
+    # for chars in leftList:
+    #     print chars
+
+
+
+
+
+
 
