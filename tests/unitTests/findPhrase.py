@@ -55,7 +55,7 @@ plist = list()
 #
 # pDict = dict(zip(phraseList, plist))
 
-# longSet = random.sample(longSet, 20)
+#longSet = random.sample(longSet, 20)
 
 for p in longSet:
     pSubList = list()
