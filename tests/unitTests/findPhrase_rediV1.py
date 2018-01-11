@@ -1,7 +1,6 @@
 #coding:utf8
 
-#从voc中间读出来所有的词
-#分成单字词、2-3字词、4字词、5字以上词4个集合
+# 这个测试脚本测试在LongHit集合上，使用charmean、charKmeans、compMean、compKMeans4个方法的AUC值
 
 import sys
 import random
@@ -157,6 +156,28 @@ def vecMean(model, compList):
     vecList= model[compList]
     return np.asarray(vecList).mean(axis=0)
 
+from scipy.cluster.vq import vq,kmeans,whiten
+from scipy.stats import mode
+
+def vecKmean(model, word, compList):
+    # 一个根据compList查找相近词，并求KMeans 的向量的函数
+    sim_words = list()
+    for char in compList:
+        simrst = model.wv.most_similar(char, topn=1000)
+        for sim_word, _ in simrst:
+            if sim_word == word:
+                continue
+            sim_words.append(sim_word)
+    kmeans_method = len(word)
+
+    data = whiten(model[sim_words])
+    centoids = kmeans(data, kmeans_method)
+
+    labels = vq(data, centoids[0])[0]
+    max_label = mode(labels).mode[0]
+
+    return centoids[0][max_label]
+
 def combTest(model, w1, w2, pDict):
     rstStandard = model.similarity(w1, w2) #标准答案
 
@@ -168,22 +189,41 @@ def combTest(model, w1, w2, pDict):
     vec2s = model[w2] if len(w2) < 5 else vecMean(model, pDict[w2])
     rsts = np.dot(matutils.unitvec(vec1s), matutils.unitvec(vec2s))
 
-    return rstStandard, rstc, rsts
+    # 下面是两个K-Means
+    vec1kc = model[w1] if len(w1) < 5 else vecKmean(model, w1, [i for i in w1 if i in model])
+    vec2kc = model[w2] if len(w2) < 5 else vecKmean(model, w2, [i for i in w2 if i in model])
+    rstkc = np.dot(matutils.unitvec(vec1kc), matutils.unitvec(vec2kc))
+
+    vec1ks = model[w1] if len(w1) < 5 else vecKmean(model, w1, pDict[w1])
+    vec2ks = model[w2] if len(w2) < 5 else vecKmean(model, w2, pDict[w2])
+    rstks = np.dot(matutils.unitvec(vec1ks), matutils.unitvec(vec2ks))
+
+    return rstStandard, rstc, rsts, rstkc, rstks
 rstList = list()
 rstLabel =list()
+cnt = 0
 for i in longHitSet:
     # print i[0], i[1]
-    r = combTest(model, i[0], i[1], pDict)
-    rstList.append([r[0], r[1], r[2]])
-    rstLabel.append(True)
-    print "====="
+    cnt += 1
 
+    r = combTest(model, i[0], i[1], pDict)
+    rstList.append(r)
+    rstLabel.append(True)
+    print cnt
+    # if cnt > 10:
+    #     break
+    # print "====="
+cnt = 0
 for i in longHitSet_neg:
     # print i[0], i[1]
     # print combTest(model, i[0], i[1], pDict)
+    cnt += 1
     r = combTest(model, i[0], i[1], pDict)
-    rstList.append([r[0], r[1], r[2]])
+    rstList.append(r)
     rstLabel.append(False)
+    print cnt
+    # if cnt > 10:
+    #     break
     print "====="
 
 
@@ -193,3 +233,5 @@ rst = np.asarray(rstList)
 print metrics.roc_auc_score(rstLabel,rst[:,0])
 print metrics.roc_auc_score(rstLabel,rst[:,1])
 print metrics.roc_auc_score(rstLabel,rst[:,2])
+print metrics.roc_auc_score(rstLabel,rst[:,3])
+print metrics.roc_auc_score(rstLabel,rst[:,4])
